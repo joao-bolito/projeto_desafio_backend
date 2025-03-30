@@ -10,18 +10,22 @@ class ManipulacaoDadosController extends Controller
 {
     public function listar()
     {
-        $dados = WeatherData::all();
+        try {
+            $dados = WeatherData::all();
 
-        if ($dados->isEmpty()) {
-            return response()->json(['message' => 'Nenhum dado encontrado'], 404);
+            if ($dados->isEmpty()) {
+                return response()->json(['message' => 'Nenhum dado encontrado'], 404);
+            }
+
+            return response()->json($dados, 200);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Erro ao listar dados', 'message' => $e->getMessage()], 500);
         }
-
-        return response()->json($dados, 200);
     }
 
     public function deletar($nome)
     {
-        try{
+        try {
             $dado = WeatherData::where('city_name', $nome)->first();
 
             if (!$dado) {
@@ -31,9 +35,8 @@ class ManipulacaoDadosController extends Controller
             $dado->delete();
 
             return response()->json(['message' => 'Registro deletado com sucesso!'], 200);
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['error' => 'Erro ao deletar dados', 'message' => $e->getMessage()], 500);
         }
-
     }
 }
