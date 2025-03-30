@@ -9,6 +9,8 @@ use App\Http\Controllers\OpenWeatherMapController;
 
 Route::get('weather', [OpenWeatherMapController::class, 'getWeather'])->middleware('autenticacao.custom');
 Route::get('listar', [ManipulacaoDadosController::class, 'listar'])->middleware('autenticacao.custom');
+Route::delete('deletar/{nome}', [ManipulacaoDadosController::class, 'deletar'])->middleware('autenticacao.custom');
+
 
 
 Route::post('registrar', [AutenticaController::class, 'registrar']);

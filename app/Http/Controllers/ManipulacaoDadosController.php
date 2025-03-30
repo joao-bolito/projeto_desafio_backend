@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WeatherData;
+use Exception;
 
 class ManipulacaoDadosController extends Controller
 {
@@ -16,5 +17,23 @@ class ManipulacaoDadosController extends Controller
         }
 
         return response()->json($dados, 200);
+    }
+
+    public function deletar($nome)
+    {
+        try{
+            $dado = WeatherData::where('city_name', $nome)->first();
+
+            if (!$dado) {
+                return response()->json(['error' => 'Registro não encontrado'], 404);
+            }
+
+            $dado->delete();
+
+            return response()->json(['message' => 'Registro deletado com sucesso!'], 200);
+        }catch (Exception $e) {
+            return response()->json(['error' => 'Erro ao deletar dados', 'message' => $e->getMessage()], 500);
+        }
+
     }
 }
