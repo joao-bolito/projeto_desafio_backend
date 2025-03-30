@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use App\Models\WeatherData;
+use App\Models\HistoricoPesquisa;
 use Exception;
 
 class OpenWeatherMapController extends Controller
@@ -53,6 +54,10 @@ class OpenWeatherMapController extends Controller
                     'timezone' => $data['timezone']
                 ]);
 
+                historicoPesquisa::create([
+                    'message' => "Atualizado dado da cidade {$name}"
+                ]);
+
                 return response()->json(['message' => 'Dados atualizados com sucesso!', 'data' => $weatherData], 200);
             }
 
@@ -88,8 +93,15 @@ class OpenWeatherMapController extends Controller
                 'city_name' => $data['name']
             ]);
 
+            historicoPesquisa::create([
+                'message' => "Salvo dado da cidade {$name}"
+            ]);
+
             return response()->json(['message' => 'Dados do clima salvos com sucesso!', 'data' => $weather], 201);
         } catch (Exception $e) {
+            historicoPesquisa::create([
+                'message' => "Erro ao salvar dado da cidade {$name}"
+            ]);
             return response()->json(['error' => 'Erro ao fazer contato com a API externa', 'message' => $e->getMessage()], 500);
         }
     }

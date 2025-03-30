@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WeatherData;
+use App\Models\HistoricoPesquisa;
+
 use Exception;
 
 class ManipulacaoDadosController extends Controller
@@ -17,8 +19,15 @@ class ManipulacaoDadosController extends Controller
                 return response()->json(['message' => 'Nenhum dado encontrado'], 404);
             }
 
+            historicoPesquisa::create([
+                'message' => "Listando dados"
+            ]);
+
             return response()->json($dados, 200);
         } catch (Exception $e) {
+            historicoPesquisa::create([
+                'message' => "Erro ao listar dados"
+            ]);
             return response()->json(['error' => 'Erro ao listar dados', 'message' => $e->getMessage()], 500);
         }
     }
@@ -34,8 +43,15 @@ class ManipulacaoDadosController extends Controller
 
             $dado->delete();
 
+            historicoPesquisa::create([
+                'message' => "Dado deletado da cidade $nome"
+            ]);
+
             return response()->json(['message' => 'Registro deletado com sucesso!'], 200);
         } catch (Exception $e) {
+            historicoPesquisa::create([
+                'message' => "Erro ao deletar dado da cidade {$nome}"
+            ]);
             return response()->json(['error' => 'Erro ao deletar dados', 'message' => $e->getMessage()], 500);
         }
     }
