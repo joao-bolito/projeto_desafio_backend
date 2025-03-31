@@ -66,6 +66,11 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
 
+
+    /*
+     * tem o propósito de registrar o AuthTokenMiddleware no Kernel do Laravel,
+     * permitindo que ele seja utilizado nas rotas da aplicação através do alias 'autenticacao.custom'.
+     */
     protected $routeMiddleware = [
         'autenticacao.custom' => \App\Http\Middleware\AuthTokenMiddleware::class,
     ];

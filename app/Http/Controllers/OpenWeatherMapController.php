@@ -13,15 +13,17 @@ class OpenWeatherMapController extends Controller
     public function getWeather(Request $request)
     {
         try {
-            // Recupera o nome da cidade via JSON
-            $appid = "169440e27bd116f260e0d9afb46fc542";
-            $name = $request->input('name');  // Agora está vindo no corpo da requisição JSON
 
+            //Criei uma variável que armazena a chave da API e passei a minha chave fixa.
+            $appid = "169440e27bd116f260e0d9afb46fc542";
+            $name = $request->input('name');  //esse valor agora está vindo no corpo da requisição JSON
+
+            //valida se o nome da cidade foi preenchido
             if (empty($name)) {
                 return response()->json(['error' => 'Nome da cidade é obrigatório'], 400);
             }
 
-            // Chama a API do Nominatim para obter as coordenadas
+            // Chama a API do Nominatim para obter as coordenadas, passando o nome da cidade como parâmetro
             $urlNominatim = "https://nominatim.openstreetmap.org/search?format=json&q={$name}";
 
             //Api Nominatim exige user-agent no cabeçalho da requisição
@@ -44,11 +46,11 @@ class OpenWeatherMapController extends Controller
             $latitude = $nominatimData[0]['lat'];
             $longitude = $nominatimData[0]['lon'];
 
-            // Verifica se os dados de clima já estão no banco
+            //traz os dados da cidade pesquisada pelo usuário
             $weatherData = WeatherData::where('city_name', $name)->first();
 
+            //Esse if valida se os dados da cidade já existe, caso existir ele faz o update no banco
             if ($weatherData) {
-                // Se os dados já existirem, atualize-os
                 $url = "https://api.openweathermap.org/data/2.5/weather?lat={$latitude}&lon={$longitude}&appid={$appid}&units=metric";
                 $response = Http::get($url);
 
@@ -80,6 +82,7 @@ class OpenWeatherMapController extends Controller
                     'timezone' => $data['timezone']
                 ]);
 
+                //Cria a mensagem de atualização dos dados na tabela HistoricoPesquisa
                 HistoricoPesquisa::create([
                     'message' => "Atualizado dado da cidade {$name}"
                 ]);
@@ -87,7 +90,7 @@ class OpenWeatherMapController extends Controller
                 return response()->json(['message' => 'Dados atualizados com sucesso!', 'data' => $weatherData], 200);
             }
 
-            // Se não houver dados, busque novos dados do clima
+            // Se não houver dados, busque novos dados do clima e faz o insert a tabela
             $url = "https://api.openweathermap.org/data/2.5/weather?lat={$latitude}&lon={$longitude}&appid={$appid}&units=metric";
             $response = Http::get($url);
 
@@ -95,6 +98,7 @@ class OpenWeatherMapController extends Controller
                 return response()->json(['error' => 'Erro ao obter dados do clima'], $response->status());
             }
 
+            //realização do insert na tabela
             $data = $response->json();
             $weather = WeatherData::create([
                 'lat' => $data['coord']['lat'],
@@ -120,12 +124,14 @@ class OpenWeatherMapController extends Controller
                 'city_name' => $data['name']
             ]);
 
+            //adiciona no HistoricoPesquisa a criação do dado na tabela
             HistoricoPesquisa::create([
                 'message' => "Salvo dado da cidade {$name}"
             ]);
 
             return response()->json(['message' => 'Dados do clima salvos com sucesso!', 'data' => $weather], 201);
         } catch (Exception $e) {
+            //Adiciona no HistoricoPesquisa o erro de salvar o dado
             HistoricoPesquisa::create([
                 'message' => "Erro ao salvar dado da cidade {$name}"
             ]);
