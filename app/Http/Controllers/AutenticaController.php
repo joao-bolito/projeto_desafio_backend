@@ -13,7 +13,6 @@ class AutenticaController extends Controller
 {
     public function registrar(Request $request)
     {
-
         try {
             // Validação dos dados
             $validator = Validator::make($request->all(), [

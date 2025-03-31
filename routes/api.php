@@ -1,7 +1,4 @@
 <?php
-
-// appid= 169440e27bd116f260e0d9afb46fc542
-
 use App\Http\Controllers\AutenticaController;
 use App\Http\Controllers\ManipulacaoDadosController;
 use Illuminate\Support\Facades\Route;
